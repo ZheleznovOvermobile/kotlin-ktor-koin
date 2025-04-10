@@ -2,9 +2,9 @@ name: Build and Test
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, debug-actions ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, debug-actions ]
 
 jobs:
   build:
@@ -20,14 +20,24 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
+    - name: Debug Java version
+      run: |
+        java -version
+        echo "JAVA_HOME: $JAVA_HOME"
+        
+    - name: Debug Gradle version
+      run: ./gradlew --version
+      
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
       
-    - name: Build with Gradle
-      run: ./gradlew build
+    - name: Build with Gradle (debug)
+      run: ./gradlew build --info --stacktrace
       
-    - name: Build Docker image
-      run: ./gradlew buildImage
+    - name: Build Docker image (debug)
+      run: |
+        docker version
+        ./gradlew buildImage --info --stacktrace
       
-    - name: Run tests
-      run: ./gradlew test 
+    - name: Run tests (debug)
+      run: ./gradlew test --info --stacktrace 
